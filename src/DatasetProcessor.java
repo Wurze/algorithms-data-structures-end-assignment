@@ -67,5 +67,16 @@ public class DatasetProcessor {
         }
         return null;
     }
+    public List<Book> sortBooksByTitle() {
+        List<Book> sortedBooks = new ArrayList<>(booksData);
+        sortedBooks.sort(Comparator.comparing(Book::getTitle));
+        return sortedBooks;
+    }
+
+    public Optional<Book> searchBookByTitle(String title) {
+        List<Book> sortedBooks = sortBooksByTitle();
+        int index = Collections.binarySearch(sortedBooks, new Book(title, "", 0.0, 0), Comparator.comparing(Book::getTitle));
+        return (index >= 0) ? Optional.of(sortedBooks.get(index)) : Optional.empty();
+    }
 
 }
