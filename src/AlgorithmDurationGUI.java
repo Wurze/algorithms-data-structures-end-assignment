@@ -26,4 +26,45 @@ public class AlgorithmDurationGUI extends JFrame implements ActionListener {
 
         datasetProcessor = new DatasetProcessor("dataset/books.csv");
     }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == runButton) {
+            runButton.setEnabled(false);
+
+            SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    long startTime, endTime;
+
+                    // Algorithm 1: Sort books by title
+                    startTime = System.currentTimeMillis();
+                    List<Book> sortedBooks = datasetProcessor.sortBooksByTitle();
+                    endTime = System.currentTimeMillis();
+                    outputArea.append("Algorithm 1 (Sort by title) duration: " + (endTime - startTime) + " ms\n");
+                    outputArea.append("First 5 sorted books by title: \n");
+                    for (int i = 0; i < 5 && i < sortedBooks.size(); i++) {
+                        outputArea.append(sortedBooks.get(i).getTitle() + "\n");
+                    }
+
+                    // Algorithm 2: Search book by title
+                    startTime = System.currentTimeMillis();
+                    String title = "In a Sunburned Country";
+                    Optional<Book> book = datasetProcessor.searchBookByTitle(title);
+                    endTime = System.currentTimeMillis();
+                    outputArea.append("Algorithm 2 (Search book by title) duration: " + (endTime - startTime) + " ms\n");
+                    book.ifPresent(b -> outputArea.append("Book found: " + b.getTitle() + "\n"));
+
+
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    outputArea.append("All algorithms completed.\n");
+                    runButton.setEnabled(true);
+                }
+            };
+            worker.execute();
+    }
+}
 }
