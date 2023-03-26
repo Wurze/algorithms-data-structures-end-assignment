@@ -36,13 +36,8 @@ public class DatasetProcessor {
                         calendar.setTime(date);
                         int publicationYear = calendar.get(Calendar.YEAR);
                         Book book = new Book(values[0], values[1], Double.parseDouble(values[2]), publicationYear);
-                        booksData.add(book);
+                        addBook(book);
 
-                        // Add book to booksByAuthor HashMap
-                        booksByAuthor.computeIfAbsent(book.getAuthor(), k -> new ArrayList<>()).add(book);
-
-                        // Add book to booksByRating HashMap
-                        booksByRating.computeIfAbsent(book.getRating(), k -> new ArrayList<>()).add(book);
                     } catch (Exception e) {
                         System.err.println("Error while parsing line: " + line);
                         e.printStackTrace();
@@ -77,6 +72,29 @@ public class DatasetProcessor {
         List<Book> sortedBooks = sortBooksByTitle();
         int index = Collections.binarySearch(sortedBooks, new Book(title, "", 0.0, 0), Comparator.comparing(Book::getTitle));
         return (index >= 0) ? Optional.of(sortedBooks.get(index)) : Optional.empty();
+    }
+
+    public double averageRatingByAuthor(String author) {
+        List<Book> authorBooks = booksByAuthor.getOrDefault(author, Collections.emptyList());
+        if (authorBooks.isEmpty()) {
+            return 0.0;
+        }
+        return authorBooks.stream().mapToDouble(Book::getRating).average().orElse(0.0);
+    }
+
+    public List<Book> findBooksWithRating(double rating) {
+        return booksByRating.getOrDefault(rating, Collections.emptyList());
+    }
+
+    // Add a book to the dataset
+    public void addBook(Book book) {
+        booksData.add(book);
+
+        // Add book to booksByAuthor HashMap
+        booksByAuthor.computeIfAbsent(book.getAuthor(), k -> new ArrayList<>()).add(book);
+
+        // Add book to booksByRating HashMap
+        booksByRating.computeIfAbsent(book.getRating(), k -> new ArrayList<>()).add(book);
     }
 
     // Delete a book by its index in the dataset
