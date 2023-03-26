@@ -54,6 +54,24 @@ public class AlgorithmDurationGUI extends JFrame implements ActionListener {
                     outputArea.append("Algorithm 2 (Search book by title) duration: " + (endTime - startTime) + " ms\n");
                     book.ifPresent(b -> outputArea.append("Book found: " + b.getTitle() + "\n"));
 
+                    // Algorithm 3: Average rating by author
+                    startTime = System.currentTimeMillis();
+                    String author = "Bill Bryson";
+                    double averageRating = datasetProcessor.averageRatingByAuthor(author);
+                    endTime = System.currentTimeMillis();
+                    outputArea.append("Algorithm 3 (Average rating by author) duration: " + (endTime - startTime) + " ms\n");
+                    outputArea.append("Average rating for author '" + author + "': " + averageRating + "\n");
+
+                    // Algorithm 4: Find books with specific rating
+                    startTime = System.currentTimeMillis();
+                    double rating = 4.5;
+                    List<Book> booksWithRating = datasetProcessor.findBooksWithRating(rating);
+                    endTime = System.currentTimeMillis();
+                    outputArea.append("Algorithm 4 (Find books with specific rating) duration: " + (endTime - startTime) + " ms\n");
+                    outputArea.append("Books with " + rating + " rating: \n");
+                    for (Book b : booksWithRating) {
+                        outputArea.append(b.getTitle() + "\n");
+                    }
 
                     return null;
                 }
