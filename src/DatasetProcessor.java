@@ -79,4 +79,40 @@ public class DatasetProcessor {
         return (index >= 0) ? Optional.of(sortedBooks.get(index)) : Optional.empty();
     }
 
+    // Delete a book by its index in the dataset
+    public void deleteBook(int index) {
+        if (index >= 0 && index < booksData.size()) {
+            Book book = booksData.remove(index);
+
+            // Remove the book from booksByAuthor HashMap
+            List<Book> authorBooks = booksByAuthor.get(book.getAuthor());
+            authorBooks.remove(book);
+            if (authorBooks.isEmpty()) {
+                booksByAuthor.remove(book.getAuthor());
+            }
+
+            // Remove the book from booksByRating HashMap
+            List<Book> ratingBooks = booksByRating.get(book.getRating());
+            ratingBooks.remove(book);
+            if (ratingBooks.isEmpty()) {
+                booksByRating.remove(book.getRating());
+            }
+        }
+    }
+
+    // Update a book at a specified index with a new book
+    public void updateBook(int index, Book newBook) {
+        if (index >= 0 && index < booksData.size()) {
+            Book oldBook = booksData.set(index, newBook);
+
+            // Update booksByAuthor HashMap
+            booksByAuthor.get(oldBook.getAuthor()).remove(oldBook);
+            booksByAuthor.computeIfAbsent(newBook.getAuthor(), k -> new ArrayList<>()).add(newBook);
+
+            // Update booksByRating HashMap
+            booksByRating.get(oldBook.getRating()).remove(oldBook);
+            booksByRating.computeIfAbsent(newBook.getRating(), k -> new ArrayList<>()).add(newBook);
+        }
+    }
+
 }
