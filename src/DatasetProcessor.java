@@ -1,136 +1,62 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
+import DataStructures.ArrayListDS;
+import DataStructures.DataStructure;
+import DataStructures.LinkedListDS;
+import DataStructures.TreeMapDS;
+
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
-public class DatasetProcessor {
-    private String booksDataset;
-    private List<Book> booksData;
-    private HashMap<String, List<Book>> booksByAuthor;
-    private HashMap<Double, List<Book>> booksByRating;
+public class DatasetProcessor<K extends Comparable<K>, V> {
+    private final LinkedListDS<K, V> linkedListTable;
+    private final ArrayListDS<K, V> arrayListTable;
+    private final TreeMapDS<K, V> treeMapTable;
 
-    public DatasetProcessor(String booksDataset) {
-        this.booksDataset = booksDataset;
-        booksData = new ArrayList<>();
-        booksByAuthor = new HashMap<>();
-        booksByRating = new HashMap<>();
-        loadData();
+    public DatasetProcessor(LinkedListDS<K, V> linkedListTable, ArrayListDS<K, V> arrayListTable, TreeMapDS<K, V> treeMapTable) {
+        this.linkedListTable = linkedListTable;
+        this.arrayListTable = arrayListTable;
+        this.treeMapTable = treeMapTable;
+    }
+    // Algorithm 1: Sort items using a comparator
+    public List<V> sortItems(Comparator<V> comparator, int dataStructureIndex) {
+        Iterable<V> items = getSelectedDataStructure(dataStructureIndex).values();
+        return StreamSupport.stream(items.spliterator(), false)
+                .sorted(comparator)
+                .collect(Collectors.toList());
     }
 
-    private void loadData() {
-        InputStream booksStream = ClassLoader.getSystemResourceAsStream(booksDataset);
-        if (booksStream != null) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(booksStream))) {
-                String line;
-                br.readLine(); // Skip header
-
-                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
-
-                while ((line = br.readLine()) != null) {
-                    try {
-                        String[] values = line.split(",");
-                        Date date = dateFormat.parse(values[3]);
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTime(date);
-                        int publicationYear = calendar.get(Calendar.YEAR);
-                        Book book = new Book(values[0], values[1], Double.parseDouble(values[2]), publicationYear);
-                        addBook(book);
-
-                    } catch (Exception e) {
-                        System.err.println("Error while parsing line: " + line);
-                        e.printStackTrace();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.err.println("File not found: " + booksDataset);
-        }
+    // Algorithm 2: Search item by criteria (predicate)
+    public Optional<V> searchItemByCriteria(Predicate<V> criteria, int dataStructureIndex) {
+        Iterable<V> items = getSelectedDataStructure(dataStructureIndex).values();
+        return StreamSupport.stream(items.spliterator(), false)
+                .filter(criteria)
+                .findFirst();
     }
 
-    public List<Book> getBooksData() {
-        return booksData;
+    // Algorithm 3: Sort items using natural order
+    public List<V> sortItemsByNaturalOrder(int dataStructureIndex) {
+        Iterable<V> items = getSelectedDataStructure(dataStructureIndex).values();
+        return StreamSupport.stream(items.spliterator(), false)
+                .sorted()
+                .collect(Collectors.toList());
     }
 
-    // Get a book by its index in the dataset
-    public Book getBook(int index) {
-        if (index >= 0 && index < booksData.size()) {
-            return booksData.get(index);
-        }
-        return null;
-    }
-    public List<Book> sortBooksByTitle() {
-        List<Book> sortedBooks = new ArrayList<>(booksData);
-        sortedBooks.sort(Comparator.comparing(Book::getTitle));
-        return sortedBooks;
+    // Algorithm 4: Search items by a specific field value (using a function)
+    public List<V> searchItemsByFieldValue(Function<V, String> fieldExtractor, String value, int dataStructureIndex) {
+        Iterable<V> items = getSelectedDataStructure(dataStructureIndex).values();
+        return StreamSupport.stream(items.spliterator(), false)
+                .filter(item -> fieldExtractor.apply(item).equals(value))
+                .collect(Collectors.toList());
     }
 
-    public Optional<Book> searchBookByTitle(String title) {
-        List<Book> sortedBooks = sortBooksByTitle();
-        int index = Collections.binarySearch(sortedBooks, new Book(title, "", 0.0, 0), Comparator.comparing(Book::getTitle));
-        return (index >= 0) ? Optional.of(sortedBooks.get(index)) : Optional.empty();
+    private DataStructure<K, V> getSelectedDataStructure(int dataStructureIndex) {
+        return switch (dataStructureIndex) {
+            case 0 -> linkedListTable;
+            case 1 -> arrayListTable;
+            case 2 -> treeMapTable;
+            default -> throw new IllegalArgumentException("Invalid data structure index");
+        };
     }
-
-    public double averageRatingByAuthor(String author) {
-        List<Book> authorBooks = booksByAuthor.getOrDefault(author, Collections.emptyList());
-        if (authorBooks.isEmpty()) {
-            return 0.0;
-        }
-        return authorBooks.stream().mapToDouble(Book::getRating).average().orElse(0.0);
-    }
-
-    public List<Book> findBooksWithRating(double rating) {
-        return booksByRating.getOrDefault(rating, Collections.emptyList());
-    }
-
-    // Add a book to the dataset
-    public void addBook(Book book) {
-        booksData.add(book);
-
-        // Add book to booksByAuthor HashMap
-        booksByAuthor.computeIfAbsent(book.getAuthor(), k -> new ArrayList<>()).add(book);
-
-        // Add book to booksByRating HashMap
-        booksByRating.computeIfAbsent(book.getRating(), k -> new ArrayList<>()).add(book);
-    }
-
-    // Delete a book by its index in the dataset
-    public void deleteBook(int index) {
-        if (index >= 0 && index < booksData.size()) {
-            Book book = booksData.remove(index);
-
-            // Remove the book from booksByAuthor HashMap
-            List<Book> authorBooks = booksByAuthor.get(book.getAuthor());
-            authorBooks.remove(book);
-            if (authorBooks.isEmpty()) {
-                booksByAuthor.remove(book.getAuthor());
-            }
-
-            // Remove the book from booksByRating HashMap
-            List<Book> ratingBooks = booksByRating.get(book.getRating());
-            ratingBooks.remove(book);
-            if (ratingBooks.isEmpty()) {
-                booksByRating.remove(book.getRating());
-            }
-        }
-    }
-
-    // Update a book at a specified index with a new book
-    public void updateBook(int index, Book newBook) {
-        if (index >= 0 && index < booksData.size()) {
-            Book oldBook = booksData.set(index, newBook);
-
-            // Update booksByAuthor HashMap
-            booksByAuthor.get(oldBook.getAuthor()).remove(oldBook);
-            booksByAuthor.computeIfAbsent(newBook.getAuthor(), k -> new ArrayList<>()).add(newBook);
-
-            // Update booksByRating HashMap
-            booksByRating.get(oldBook.getRating()).remove(oldBook);
-            booksByRating.computeIfAbsent(newBook.getRating(), k -> new ArrayList<>()).add(newBook);
-        }
-    }
-
 }
