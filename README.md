@@ -4,19 +4,19 @@ This Java application processes a dataset containing information about books, su
 
 The application supports the following algorithms:
 
-* Algorithm 1: Sort by title → sortItems: Sorts the books in alphabetical order by their titles.
-* Algorithm 2: Search book by title → searchItemByCriteria: Searches for a book in the dataset using its title.
-* Algorithm 3: Sort by natural order → sortItemsByNaturalOrder: Sorts the books in the dataset based on their natural order.
-* Algorithm 4: Search books by author → searchItemsByFieldValue: Searches for all books written by a specific author in the dataset.
+* **Algorithm 1**: Sort by title → sortItems: Sorts the books in alphabetical order by their titles.
+* **Algorithm 2**: Search book by title → searchItemByCriteria: Searches for a book in the dataset using its title.
+* **Algorithm 3**: Sort by natural order → sortItemsByNaturalOrder: Sorts the books in the dataset based on their natural order.
+* **Algorithm 4**: Search books by author → searchItemsByFieldValue: Searches for all books written by a specific author in the dataset.
 
 The application uses three different data structures (LinkedListDS, ArrayListDS, and TreeMapDS) to store the dataset, allowing users to compare the performance of the algorithms for different data structures.
 
-The application also provides basic manipulation methods for the dataset:
+The application also provides basic manipulation methods for the dataset using the put, get, remove, and values methods of the DataStructure interface:
 
-* Retrieve a book by its index in the dataset.
-* Add a new book to the dataset.
-* Delete a book by its index in the dataset.
-* Update a book at a specified index with a new book.
+* **put**: Adds a new book to the dataset by associating the book's properties with a
+* **get**: Retrieves a book from the dataset using its key.
+* **remove**: Deletes a book from the dataset using its key.
+* **values**: Returns an iterable collection of all books in the dataset.
 
 ## Getting Started
 ### Prerequisites
