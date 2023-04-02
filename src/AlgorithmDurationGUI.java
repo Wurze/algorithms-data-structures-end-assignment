@@ -6,6 +6,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -26,12 +31,16 @@ public class AlgorithmDurationGUI extends JFrame implements ActionListener {
         JButton loadDataButton = new JButton("Load Books Data");
         loadDataButton.addActionListener(e -> {
             loadDataButton.setEnabled(false);
-
+            List<Book> booksData = AlgorithmWorker.loadBooksData("Dataset/books.csv");
             LinkedListDS<String, Book> linkedListTable = new LinkedListDS<>();
             ArrayListDS<String, Book> arrayListTable = new ArrayListDS<>();
             TreeMapDS<String, Book> treeMapTable = new TreeMapDS<>();
 
-
+            for (Book book : booksData) {
+                linkedListTable.put(book.getTitle(), book);
+                arrayListTable.put(book.getTitle(), book);
+                treeMapTable.put(book.getTitle(), book);
+            }
 
             bookProcessor = new DatasetProcessor<>(linkedListTable, arrayListTable, treeMapTable);
             loadDataButton.setEnabled(true);
@@ -172,8 +181,36 @@ public class AlgorithmDurationGUI extends JFrame implements ActionListener {
             runButton.setEnabled(true);
         }
 
+        public static List<Book> loadBooksData(String booksDataset) {
+            List<Book> booksData = new ArrayList<>();
 
+            InputStream booksStream = ClassLoader.getSystemResourceAsStream(booksDataset);
+            if (booksStream != null) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(booksStream))) {
+                    String line;
+                    br.readLine(); // Skip header
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
+                    while ((line = br.readLine()) != null) {
+                        try{
+                            String[] values = line.split(",");
+                            Date date = dateFormat.parse(values[3]);
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTime(date);
+                            int publicationYear = calendar.get(Calendar.YEAR);
+                            Book book = new Book(values[0], values[1], Double.parseDouble(values[2]), publicationYear);
+                            booksData.add(book);
+                        }
+                        catch (Exception e) {
+                            System.err.println("Error while parsing line: " + line);
+                            e.printStackTrace();
+                        }
+                    } }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return booksData;
+        }
+    }
     }
 
-
-}
