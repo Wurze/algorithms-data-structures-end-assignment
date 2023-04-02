@@ -1,4 +1,4 @@
-public class Book {
+public class Book implements Comparable<Book> {
     private String title;
     private String author;
     private double rating;
@@ -51,5 +51,10 @@ public class Book {
                 ", rating=" + rating +
                 ", publicationDate=" + publicationDate +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Book o) {
+        return 0;
     }
 }
