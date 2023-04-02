@@ -1,13 +1,15 @@
 # Algorithms data-structures end-assignment
-This Java application processes a dataset containing information about books, such as title, author, rating, and publication date. The application provides a graphical user interface (GUI) to execute various algorithms on the dataset and display the results and duration of the algorithms' execution.
+This Java application processes a dataset containing information about books, such as title, author, price, and publication year. The application provides a graphical user interface (GUI) to execute various algorithms on the dataset and display the results and duration of the algorithms' execution.
 ## Features
 
 The application supports the following algorithms:
 
-* Sort books by title: Sorts the books in alphabetical order by their titles.
-* Search book by title: Searches for a book in the dataset using its title.
-* Average rating by author: Calculates the average rating of all books written by a specific author.
-* Find books with a specific rating: Finds all books in the dataset that have a specific rating.
+* Algorithm 1: Sort by title → sortItems: Sorts the books in alphabetical order by their titles.
+* Algorithm 2: Search book by title → searchItemByCriteria: Searches for a book in the dataset using its title.
+* Algorithm 3: Sort by natural order → sortItemsByNaturalOrder: Sorts the books in the dataset based on their natural order.
+* Algorithm 4: Search books by author → searchItemsByFieldValue: Searches for all books written by a specific author in the dataset.
+
+The application uses three different data structures (LinkedListDS, ArrayListDS, and TreeMapDS) to store the dataset, allowing users to compare the performance of the algorithms for different data structures.
 
 The application also provides basic manipulation methods for the dataset:
 
@@ -35,8 +37,10 @@ git clone https://github.com/yourusername/book-dataset-processor.git
 
 ### Usage
 
-4. Click the "Run Algorithms" button to execute the algorithms on the dataset.
-5. The results and duration of the algorithms' execution will be displayed in the output area.
+4. Load Books Data: Click the "Load Books Data" button to load the dataset into the application.
+5. Algorithm Selection: Select a data structure and algorithm to execute from the drop-down menus.
+6. Execute Algorithm: Click the "Execute Algorithm" button to run the selected algorithm on the dataset.
+7. Results: The results and duration of the algorithm's execution will be displayed in the output area.
 
 ## Dataset
 
@@ -45,7 +49,7 @@ The books.csv file contains the dataset used in this application. Each line in t
 * Title
 * Author
 * Rating (0-5 scale)
-* Publication date (YYYY format)
+* Publication date (DD/MM/YYYY format)
 
 
 ## License
