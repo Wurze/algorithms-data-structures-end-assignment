@@ -21,9 +21,15 @@ public class DatasetProcessor<K extends Comparable<K>, V> {
     }
     // Algorithm 1: Sort items using a comparator
     public List<V> sortItems(Comparator<V> comparator, int dataStructureIndex) {
+        DataStructure<K, V> dataStructure = getSelectedDataStructure(dataStructureIndex);
         Iterable<V> items = getSelectedDataStructure(dataStructureIndex).values();
+        if (dataStructure instanceof LinkedListDS) {
+            linkedListTable.bubbleSort(comparator);
+        } else if (dataStructure instanceof ArrayListDS) {
+            arrayListTable.quickSort(comparator);
+        }  // TreeMap is already sorted by its natural ordering
+
         return StreamSupport.stream(items.spliterator(), false)
-                .sorted(comparator)
                 .collect(Collectors.toList());
     }
 
